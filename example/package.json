@@ -2,6 +2,10 @@
   "name": "web-hybrid-socket-example",
   "version": "1.0.0",
   "description": "",
+  "main": "dist/server/demo_server.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && webpack",
@@ -13,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.2",
+    "web-hybrid-socket": "file:..",
     "web-hybrid-socket-client": "file:../client",
     "web-hybrid-socket-server": "file:../server"
   },

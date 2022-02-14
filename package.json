@@ -1,0 +1,33 @@
+{
+  "name": "web-hybrid-socket",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "run-s install:*",
+    "install:client": "npm --prefix ./client install ./client",
+    "install:server": "npm --prefix ./server install ./server",
+    "install:example": "npm --prefix ./example install ./example",
+    "dev": "run-p dev:*",
+    "dev:client": "npm --prefix ./client run dev",
+    "dev:server": "npm --prefix ./server run dev",
+    "dev:example": "npm --prefix ./example run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Leede-OU/web-hybrid-socket.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Leede-OU/web-hybrid-socket/issues"
+  },
+  "homepage": "https://github.com/Leede-OU/web-hybrid-socket#readme",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}

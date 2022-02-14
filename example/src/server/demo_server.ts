@@ -1,20 +1,17 @@
 import * as http from "http";
 import * as express from "express";
-// import * as path from "path";
+import * as path from "path";
 import { WebHybridSocketServer } from "web-hybrid-socket-server";
 
 // http server
 const app = express();
 const server = new http.Server(app);
 
-/*
-// Serve html and js assets
-const rootPath = path.dirname(__dirname);
-
-app.get("/", (req, res) => {
-  res.sendFile(path.resolve(rootPath, "src", "index.html"));
-});
-*/
+// Serve static assets
+if (process.env.NODE_ENV !== "development") {
+  const staticPath = path.resolve(__dirname, "..", "client");
+  app.use(express.static(staticPath));
+}
 
 // Simple broadcasting server
 const whss = new WebHybridSocketServer({
