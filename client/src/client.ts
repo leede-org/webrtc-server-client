@@ -12,13 +12,17 @@ export class WebHybridSocketClient {
   constructor(url: string) {
     this.ws = new WebSocket(url);
 
+    this.ws.onopen = () => {
+      console.log("[WebHybridSocketClient] WS connection established");
+    };
+
     this.ws.onmessage = async ({ data }) => {
       const config = JSON.parse(data);
       this.createPeerConnection(config);
     };
 
     this.ws.onclose = () => {
-      console.log("[WebHybridSocketClient] LOST CONNECTION");
+      console.log("[WebHybridSocketClient] WS connection lost");
 
       if (this.pc) {
         this.pc.close();
@@ -45,13 +49,16 @@ export class WebHybridSocketClient {
           await this.acceptOffer(msg.sdp);
           break;
         case "candidate":
-          await this.pc.addIceCandidate({ candidate: msg.candidate });
+          await this.pc.addIceCandidate({
+            candidate: msg.candidate,
+            sdpMid: msg.mid,
+          });
           break;
       }
     };
 
     this.pc.onsignalingstatechange = () => {
-      console.log(`[WebHybridSocketClient]`, this.pc.signalingState);
+      // console.log(`[WebHybridSocketClient]`, this.pc.signalingState);
     };
 
     this.pc.ondatachannel = ({ channel }) => {
@@ -80,7 +87,7 @@ export class WebHybridSocketClient {
     };
 
     this.pc.onicecandidate = (ev) => {
-      console.log("[WebHybridSocketClient]", ev.candidate);
+      // console.log("[WebHybridSocketClient]", ev.candidate);
 
       if (!ev.candidate) {
         return;

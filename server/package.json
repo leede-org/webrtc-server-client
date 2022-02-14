@@ -10,12 +10,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "dev": "tsc-watch --onSuccess \"node .\""
+    "dev": "tsc-watch"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "node-datachannel": "^0.2.2",
+    "web-hybrid-socket": "file:..",
     "ws": "^8.5.0"
   },
   "devDependencies": {

@@ -18,6 +18,7 @@ export class WebHybridSocketServer {
   private getClientRtcConfiguration() {
     const clientRtcConfiguration: RTCConfiguration = {
       iceServers: [],
+      iceTransportPolicy: "all",
     };
 
     for (const iceServer of this.options.iceServers) {
@@ -46,6 +47,11 @@ export class WebHybridSocketServer {
       const id = this.nextConnectionId++;
       const pc = new PeerConnection(id.toString(), {
         iceServers: options.iceServers,
+        iceTransportPolicy: "all",
+      });
+
+      pc.onLocalCandidate((candidate, mid) => {
+        ws.send(JSON.stringify({ type: "candidate", candidate, mid }));
       });
 
       pc.onLocalDescription((sdp, type) => {
