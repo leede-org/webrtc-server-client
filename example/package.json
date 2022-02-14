@@ -13,7 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.2",
-    "web-hybrid-socket": "file:..",
     "web-hybrid-socket-client": "file:../client",
     "web-hybrid-socket-server": "file:../server"
   },
