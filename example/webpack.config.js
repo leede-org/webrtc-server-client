@@ -1,14 +1,21 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { EnvironmentPlugin } = require("webpack");
 
 module.exports = {
-  mode: "development",
+  mode: process.env.NODE_ENV || "development",
   entry: "./src/demo_client.ts",
   devtool: "inline-source-map",
   devServer: {
     static: "./dist",
   },
-  plugins: [new HtmlWebpackPlugin()],
+  plugins: [
+    new EnvironmentPlugin({
+      NODE_ENV: "development",
+      SERVER_URL: "ws://localhost:8000",
+    }),
+    new HtmlWebpackPlugin(),
+  ],
   module: {
     rules: [
       {

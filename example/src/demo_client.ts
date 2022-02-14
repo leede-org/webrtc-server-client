@@ -1,6 +1,6 @@
 import { WebHybridSocketClient } from "web-hybrid-socket-client";
 
-const client = new WebHybridSocketClient(`ws://localhost:8000`);
+const client = new WebHybridSocketClient(process.env.SERVER_URL);
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 const playersTableBody = document.querySelector("#players tbody");

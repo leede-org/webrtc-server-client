@@ -7,6 +7,8 @@ export interface WebHybridSocketServerOptions {
   port?: number;
   server?: http.Server;
   iceServers: (string | IceServer)[];
+  portRangeBegin?: number;
+  portRangeEnd?: number;
 }
 
 export class WebHybridSocketServer {
@@ -48,9 +50,12 @@ export class WebHybridSocketServer {
       const pc = new PeerConnection(id.toString(), {
         iceServers: options.iceServers,
         iceTransportPolicy: "all",
+        portRangeBegin: options.portRangeBegin,
+        portRangeEnd: options.portRangeEnd,
       });
 
       pc.onLocalCandidate((candidate, mid) => {
+        // console.log(`[SERVER] ${candidate}`);
         ws.send(JSON.stringify({ type: "candidate", candidate, mid }));
       });
 
@@ -72,7 +77,7 @@ export class WebHybridSocketServer {
 
       const signalingListener = (buffer: Buffer) => {
         const message = JSON.parse(buffer.toString());
-        console.log("[SERVER]", message);
+        // console.log("[SERVER]", message);
 
         switch (message.type) {
           case "answer":

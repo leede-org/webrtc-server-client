@@ -10,6 +10,7 @@ export class WebHybridSocketClient {
   public onclose = () => {};
 
   constructor(url: string) {
+    console.log(`[WebHybridSocketClient] Connecting to ${url}`);
     this.ws = new WebSocket(url);
 
     this.ws.onopen = () => {
