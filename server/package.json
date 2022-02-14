@@ -1,0 +1,26 @@
+{
+  "name": "web-hybrid-socket-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "dev": "tsc-watch --onSuccess \"node .\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-datachannel": "^0.2.2",
+    "ws": "^8.5.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.2.2",
+    "tsc-watch": "^4.6.0",
+    "typescript": "^4.5.5"
+  }
+}
