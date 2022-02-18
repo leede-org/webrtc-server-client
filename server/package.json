@@ -12,8 +12,12 @@
     "build": "tsc",
     "dev": "tsc-watch"
   },
-  "author": "Leede",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leede-org/web-hybrid-socket.git"
+  },
+  "author": "Leede <info@leede.ee> (https://leede.ee)",
+  "license": "MIT",
   "dependencies": {
     "node-datachannel": "^0.2.2",
     "ws": "^8.5.0"

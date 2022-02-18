@@ -26,10 +26,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Leede-OU/web-hybrid-socket.git"
+    "url": "git+https://github.com/leede-org/web-hybrid-socket.git"
   },
-  "author": "Leede",
-  "license": "ISC",
+  "author": "Leede <info@leede.ee> (https://leede.ee)",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Leede-OU/web-hybrid-socket/issues"
   },

@@ -12,8 +12,12 @@
     "build": "tsc && webpack",
     "dev": "tsc-watch"
   },
-  "author": "Leede",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leede-org/web-hybrid-socket.git"
+  },
+  "author": "Leede <info@leede.ee> (https://leede.ee)",
+  "license": "MIT",
   "devDependencies": {
     "ts-loader": "^9.2.6",
     "tsc-watch": "^4.6.0",

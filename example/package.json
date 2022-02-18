@@ -13,8 +13,12 @@
     "dev:client": "webpack serve",
     "dev:server": "tsc-watch --onSuccess \"node dist/server/demo_server.js\""
   },
-  "author": "Leede",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leede-org/web-hybrid-socket.git"
+  },
+  "author": "Leede <info@leede.ee> (https://leede.ee)",
+  "license": "MIT",
   "dependencies": {
     "@leede/web-hybrid-socket-client": "file:../client",
     "@leede/web-hybrid-socket-server": "file:../server",
