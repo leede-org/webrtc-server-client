@@ -1,3 +1,12 @@
+if (!process.env.WEB_HYBRID_SOCKET_BROWSER) {
+  const ws = require("ws");
+  const wrtc = require("wrtc");
+
+  global.WebSocket = ws.WebSocket;
+  global.RTCPeerConnection = wrtc.RTCPeerConnection;
+  global.RTCSessionDescription = wrtc.RTCSessionDescription;
+}
+
 export class WebHybridSocketClient {
   private ws: WebSocket;
   private pc: RTCPeerConnection;

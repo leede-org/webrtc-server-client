@@ -73,7 +73,7 @@ export class WebHybridSocketServer {
         this.onconnection(connection);
       });
 
-      pc.onSignalingStateChange((state) => console.log("[SERVER]", state));
+      // pc.onSignalingStateChange((state) => console.log("[SERVER]", state));
 
       const signalingListener = (buffer: Buffer) => {
         const message = JSON.parse(buffer.toString());
@@ -92,7 +92,6 @@ export class WebHybridSocketServer {
       ws.on("message", signalingListener);
 
       ws.on("close", () => {
-        console.log(`${id} disconected`);
         this.connections.get(id)?.onclose();
         this.connections.delete(id);
       });

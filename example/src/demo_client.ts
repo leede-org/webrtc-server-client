@@ -1,6 +1,7 @@
 import { WebHybridSocketClient } from "@leede/web-hybrid-socket-client";
 
 const client = new WebHybridSocketClient(
+  // @ts-ignore
   process.env.SERVER_URL || `ws://${location.hostname}:${location.port}`
 );
 const canvas = document.querySelector("canvas");

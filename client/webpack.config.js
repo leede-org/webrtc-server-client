@@ -1,5 +1,6 @@
 const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
+const { DefinePlugin } = require("webpack");
 
 module.exports = {
   mode: "production",
@@ -20,6 +21,9 @@ module.exports = {
   },
   devtool: "source-map",
   plugins: [
+    new DefinePlugin({
+      "process.env.WEB_HYBRID_SOCKET_BROWSER": "1",
+    }),
     new TerserPlugin({
       include: /\.min\.js$/,
     }),

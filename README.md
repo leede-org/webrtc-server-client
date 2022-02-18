@@ -1,5 +1,7 @@
 # Web Hybrid Socket
 
+The Web Hybrid Socket package provides a Node.JS server for handling real-time communications over both WebSocket for ordered reliable TCP messaging and WebRTC for unordered unreliable UDP messaging. The client can be used in a browser as well as in a Node.JS context.
+
 ## Install
 
 ```sh
