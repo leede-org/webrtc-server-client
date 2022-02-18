@@ -1,4 +1,4 @@
-import { WebHybridSocketClient } from "web-hybrid-socket-client";
+import { WebHybridSocketClient } from "@leede/web-hybrid-socket-client";
 
 const client = new WebHybridSocketClient(
   process.env.SERVER_URL || `ws://${location.hostname}:${location.port}`
@@ -6,9 +6,6 @@ const client = new WebHybridSocketClient(
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 const playersTableBody = document.querySelector("#players tbody");
-
-canvas.width = canvas.clientWidth;
-canvas.height = canvas.clientHeight;
 
 let players = {};
 let myId: number;
@@ -73,6 +70,15 @@ function updatePlayersTable() {
 
   playersTableBody.innerHTML = tbody;
 }
+
+// Keep canvas resolution equal to canvas size on screen
+function updateCanvasResolution() {
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+}
+
+updateCanvasResolution();
+window.addEventListener("resize", updateCanvasResolution);
 
 // Render loop
 function render() {

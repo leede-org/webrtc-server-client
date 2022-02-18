@@ -1,7 +1,7 @@
 import * as http from "http";
 import * as express from "express";
 import * as path from "path";
-import { WebHybridSocketServer } from "web-hybrid-socket-server";
+import { WebHybridSocketServer } from "@leede/web-hybrid-socket-server";
 
 // http server
 const app = express();

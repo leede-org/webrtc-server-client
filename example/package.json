@@ -1,5 +1,5 @@
 {
-  "name": "web-hybrid-socket-example",
+  "name": "@leede/web-hybrid-socket-example",
   "version": "1.0.0",
   "description": "",
   "main": "dist/server/demo_server.js",
@@ -13,16 +13,16 @@
     "dev:client": "webpack serve",
     "dev:server": "tsc-watch --onSuccess \"node dist/server/demo_server.js\""
   },
-  "author": "",
+  "author": "Leede",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.2",
-    "web-hybrid-socket": "file:..",
-    "web-hybrid-socket-client": "file:../client",
-    "web-hybrid-socket-server": "file:../server"
+    "@leede/web-hybrid-socket-client": "file:../client",
+    "@leede/web-hybrid-socket-server": "file:../server",
+    "express": "^4.17.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
+    "@types/node": "^17.0.18",
     "html-webpack-plugin": "^5.5.0",
     "npm-run-all": "^4.1.5",
     "ts-loader": "^9.2.6",

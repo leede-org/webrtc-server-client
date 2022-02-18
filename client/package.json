@@ -1,5 +1,5 @@
 {
-  "name": "web-hybrid-socket-client",
+  "name": "@leede/web-hybrid-socket-client",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -12,7 +12,7 @@
     "build": "tsc && webpack",
     "dev": "tsc-watch"
   },
-  "author": "",
+  "author": "Leede",
   "license": "ISC",
   "devDependencies": {
     "ts-loader": "^9.2.6",
@@ -20,8 +20,5 @@
     "typescript": "^4.5.5",
     "webpack": "^5.68.0",
     "webpack-cli": "^4.9.2"
-  },
-  "dependencies": {
-    "web-hybrid-socket": "file:.."
   }
 }

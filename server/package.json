@@ -1,5 +1,5 @@
 {
-  "name": "web-hybrid-socket-server",
+  "name": "@leede/web-hybrid-socket-server",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -12,11 +12,10 @@
     "build": "tsc",
     "dev": "tsc-watch"
   },
-  "author": "",
+  "author": "Leede",
   "license": "ISC",
   "dependencies": {
     "node-datachannel": "^0.2.2",
-    "web-hybrid-socket": "file:..",
     "ws": "^8.5.0"
   },
   "devDependencies": {
