@@ -4,7 +4,7 @@ The WebRTC server-client package provides a Node.js server that acts as a centra
 
 The client can be used in a browser as well as in a Node.js context.
 
-See a live demo at <https://webrtc-server-client.leede.ee/demo/>. The source code of the live demo is in the `example` directory in this repository.
+Check out the [live demo](https://webrtc-server-client.leede.ee/demo/) or the [documentation](https://webrtc-server-client.leede.ee/docs/).
 
 ## Server
 
@@ -51,6 +51,8 @@ server.onconnection = (connection) => {
   };
 };
 ```
+
+For detailed usage, see the [server documentation](https://webrtc-server-client.leede.ee/docs/modules/_leede_webrtc_server.html).
 
 ## Client
 
@@ -128,3 +130,5 @@ client.onbinary = (buffer) => {
   console.log("[CLIENT] Received buffer:", buffer);
 };
 ```
+
+For detailed usage, see the [client documentation](https://webrtc-server-client.leede.ee/docs/modules/_leede_webrtc_client.html).

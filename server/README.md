@@ -1,8 +1,14 @@
 # WebRTC Server
 
+Check out the [live demo](https://webrtc-server-client.leede.ee/demo/) or the [documentation](https://webrtc-server-client.leede.ee/docs/).
+
+## Server installation
+
 ```sh
 npm install @leede/webrtc-server
 ```
+
+## Basic server usage example
 
 ```ts
 import { WebRTCServer } from "@leede/webrtc-server";
@@ -12,7 +18,7 @@ const server = new WebRTCServer({
   iceServers: ["stun:stun.l.google.com:19302"],
 });
 
-server.onconnection = async (connection) => {
+server.onconnection = (connection) => {
   console.log("[SERVER] New connection");
 
   // Send reliable messages
@@ -39,3 +45,5 @@ server.onconnection = async (connection) => {
   };
 };
 ```
+
+For detailed usage, see the [server documentation](https://webrtc-server-client.leede.ee/docs/modules/_leede_webrtc_server.html).
