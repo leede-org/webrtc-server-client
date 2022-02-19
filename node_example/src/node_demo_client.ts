@@ -1,25 +1,34 @@
-import { WebHybridSocketClient } from "@leede/web-hybrid-socket-client";
+// Polyfills
+const ws = require("ws");
+const wrtc = require("wrtc");
 
-const whsc = new WebHybridSocketClient("ws://localhost:8000");
+global.WebSocket = ws.WebSocket;
+global.RTCPeerConnection = wrtc.RTCPeerConnection;
+global.RTCSessionDescription = wrtc.RTCSessionDescription;
 
-whsc.onopen = () => {
-  console.log("Connection established");
+// WebRTCClient can be used in Node.JS after the above global variables are provided
+import { WebRTCClient } from "@leede/webrtc-client";
 
-  // Send reliable TCP messages using WebSocket
-  whsc.reliable("Hello from client over WebSocket");
-  whsc.reliable(new Float32Array([1.0, 3.14]).buffer);
+const client = new WebRTCClient("ws://localhost:8000");
 
-  // Send unreliable UDP messages using WebRTC
-  whsc.unreliable("Hello from client over WebRTC");
-  whsc.reliable(Buffer.from([0, 1, 1, 2, 3, 5, 8, 13, 21, 34]));
+client.onopen = () => {
+  console.log("[CLIENT] Connected");
+
+  // Send reliable TCP messages
+  client.sendR("Hello from client over TCP");
+  client.sendR(new Float32Array([1.0, 3.14]).buffer);
+
+  // Send unreliable UDP messages
+  client.sendU("Hello from client over UDP");
+  client.sendU(Buffer.from([0, 1, 1, 2, 3, 5, 8, 13, 21, 34]));
 };
 
 // Handle string messages from server
-whsc.onmessage = (message) => {
-  console.log(`Received message: ${message}`);
+client.onmessage = (message) => {
+  console.log("[CLIENT] Received message:", message);
 };
 
 // Handle binary messages from server
-whsc.onbinary = (buffer) => {
-  console.log(`Received buffer:`, buffer);
+client.onbinary = (buffer) => {
+  console.log("[CLIENT] Received buffer:", buffer);
 };

@@ -1,19 +1,17 @@
 const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
-const { DefinePlugin } = require("webpack");
 
 module.exports = {
-  mode: "production",
+  mode: process.env.NODE_ENV === "production" ? "production" : "development",
   entry: {
-    "web-hybrid-socket-client": "./src/index.ts",
-    "web-hybrid-socket-client.min": "./src/index.ts",
+    "leede-webrtc-client": "./src/index.ts",
+    "leede-webrtc-client.min": "./src/index.ts",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
     libraryTarget: "umd",
-    library: "WebHybridSocketClient",
-    libraryExport: "WebHybridSocketClient",
+    library: "Leede",
     umdNamedDefine: true,
   },
   resolve: {
@@ -21,9 +19,6 @@ module.exports = {
   },
   devtool: "source-map",
   plugins: [
-    new DefinePlugin({
-      "process.env.WEB_HYBRID_SOCKET_BROWSER": "1",
-    }),
     new TerserPlugin({
       include: /\.min\.js$/,
     }),

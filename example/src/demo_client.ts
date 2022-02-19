@@ -1,6 +1,6 @@
-import { WebHybridSocketClient } from "@leede/web-hybrid-socket-client";
+import { WebRTCClient } from "@leede/webrtc-client";
 
-const client = new WebHybridSocketClient(
+const client = new WebRTCClient(
   // @ts-ignore
   process.env.SERVER_URL || `ws://${location.hostname}:${location.port}`
 );
@@ -11,11 +11,11 @@ const playersTableBody = document.querySelector("#players tbody");
 let players = {};
 let myId: number;
 
-// Start sending cursor position once connected
+// Start sending cursor position once connected to cursors channel
 client.onopen = () => {
   canvas.addEventListener("mousemove", (ev) => {
     if (myId) {
-      client.unreliable(new Uint16Array([ev.offsetX, ev.offsetY]).buffer);
+      client.sendU(new Uint16Array([ev.offsetX, ev.offsetY]).buffer);
     }
   });
 };

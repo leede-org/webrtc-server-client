@@ -1,9 +1,13 @@
-import { IceServer, PeerConnection } from "node-datachannel";
+import {
+  DataChannelInitConfig,
+  IceServer,
+  PeerConnection,
+} from "node-datachannel";
 import { WebSocketServer } from "ws";
 import * as http from "http";
-import { WebHybridSocketConnection } from "./connection";
+import { WebRTCConnection } from "./connection";
 
-export interface WebHybridSocketServerOptions {
+export interface WebRTCServerOptions {
   port?: number;
   server?: http.Server;
   iceServers: (string | IceServer)[];
@@ -11,11 +15,11 @@ export interface WebHybridSocketServerOptions {
   portRangeEnd?: number;
 }
 
-export class WebHybridSocketServer {
-  public onconnection = (connection: WebHybridSocketConnection) => {};
+export class WebRTCServer {
+  public onconnection = (connection: WebRTCConnection) => {};
 
   private nextConnectionId = 1;
-  private connections = new Map<number, WebHybridSocketConnection>();
+  private connections = new Map<string, WebRTCConnection>();
 
   private getClientRtcConfiguration() {
     const clientRtcConfiguration: RTCConfiguration = {
@@ -35,51 +39,46 @@ export class WebHybridSocketServer {
     return clientRtcConfiguration;
   }
 
-  constructor(private options: WebHybridSocketServerOptions) {
+  constructor(private options: WebRTCServerOptions) {
     const wss = new WebSocketServer({
       port: options.port,
       server: options.server,
     });
 
-    const clientRtcConfigurationJSON = JSON.stringify(
-      this.getClientRtcConfiguration()
-    );
+    const clientRtcConfigurationJSON = JSON.stringify({
+      type: "config",
+      config: this.getClientRtcConfiguration(),
+    });
 
     wss.on("connection", (ws) => {
-      const id = this.nextConnectionId++;
-      const pc = new PeerConnection(id.toString(), {
+      // Generate unique ID
+      const id = (this.nextConnectionId++).toString();
+
+      // Create WebRTC peer connection
+      const pc = new PeerConnection(id, {
         iceServers: options.iceServers,
         iceTransportPolicy: "all",
         portRangeBegin: options.portRangeBegin,
         portRangeEnd: options.portRangeEnd,
       });
 
-      pc.onLocalCandidate((candidate, mid) => {
-        // console.log(`[SERVER] ${candidate}`);
-        ws.send(JSON.stringify({ type: "candidate", candidate, mid }));
+      pc.onStateChange((state) => {
+        switch (state) {
+          case "disconnected":
+            this.connections.get(id)?.onclose();
+            this.connections.delete(id);
+            break;
+        }
       });
 
-      pc.onLocalDescription((sdp, type) => {
-        ws.send(JSON.stringify({ type, sdp }));
-      });
-
-      const dc = pc.createDataChannel("data");
-
-      dc.onOpen(() => {
-        ws.off("message", signalingListener);
-
-        const connection = new WebHybridSocketConnection(this, ws, dc);
-        this.connections.set(id, connection);
-        this.onconnection(connection);
-      });
-
-      // pc.onSignalingStateChange((state) => console.log("[SERVER]", state));
-
-      const signalingListener = (buffer: Buffer) => {
+      // Handle signalling
+      ws.on("message", (buffer: Buffer) => {
         const message = JSON.parse(buffer.toString());
-        // console.log("[SERVER]", message);
 
         switch (message.type) {
+          case "ping":
+            ws.send('{ "type": "pong" }');
+            break;
           case "answer":
             pc.setRemoteDescription(message.sdp, message.type);
             break;
@@ -87,16 +86,45 @@ export class WebHybridSocketServer {
             pc.addRemoteCandidate(message.candidate, message.mid);
             break;
         }
-      };
-
-      ws.on("message", signalingListener);
-
-      ws.on("close", () => {
-        this.connections.get(id)?.onclose();
-        this.connections.delete(id);
       });
 
+      pc.onLocalCandidate((candidate, mid) =>
+        ws.send(JSON.stringify({ type: "candidate", candidate, mid }))
+      );
+
+      pc.onLocalDescription((sdp, type) =>
+        ws.send(JSON.stringify({ type, sdp }))
+      );
+
       ws.send(clientRtcConfigurationJSON);
+
+      // Set up a reliable and an unreliable data channel
+      let readyState = 0;
+
+      const reliableChannel = pc.createDataChannel("reliable", {
+        ordered: true,
+      });
+      const unreliableChannel = pc.createDataChannel("unreliable", {
+        ordered: false,
+        maxPacketLifeTime: undefined,
+        maxRetransmits: 0,
+      });
+
+      for (const channel of [reliableChannel, unreliableChannel]) {
+        channel.onOpen(() => {
+          // Create connection instance when both channels are open
+          if (++readyState === 2) {
+            const connection = new WebRTCConnection(
+              this,
+              id,
+              reliableChannel,
+              unreliableChannel
+            );
+            this.connections.set(id, connection);
+            this.onconnection(connection);
+          }
+        });
+      }
     });
   }
 
@@ -104,27 +132,19 @@ export class WebHybridSocketServer {
     return this.connections.values();
   }
 
-  broadcastReliable(message: string | ArrayBuffer) {
+  broadcastR(message: string | ArrayBuffer) {
     const connections = this.getConnections();
 
     for (const connection of connections) {
-      connection.reliable(message);
+      connection.sendR(message);
     }
   }
 
-  broadcastUnreliable(message: string | ArrayBuffer) {
+  broadcastU(message: string | ArrayBuffer) {
     const connections = this.getConnections();
 
     for (const connection of connections) {
-      connection.unreliable(message);
+      connection.sendU(message);
     }
-  }
-
-  broadcast(message: string | ArrayBuffer, reliable: boolean) {
-    if (reliable) {
-      return this.broadcastReliable(message);
-    }
-
-    return this.broadcastUnreliable(message);
   }
 }

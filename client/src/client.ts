@@ -1,60 +1,35 @@
-if (!process.env.WEB_HYBRID_SOCKET_BROWSER) {
-  const ws = require("ws");
-  const wrtc = require("wrtc");
-
-  global.WebSocket = ws.WebSocket;
-  global.RTCPeerConnection = wrtc.RTCPeerConnection;
-  global.RTCSessionDescription = wrtc.RTCSessionDescription;
-}
-
-export class WebHybridSocketClient {
+export class WebRTCClient {
   private ws: WebSocket;
   private pc: RTCPeerConnection;
-  private dc: RTCDataChannel;
-  private connected = false;
+  private rc: RTCDataChannel;
+  private uc: RTCDataChannel;
+  private pingSendTime: number;
+  private pingTimer: NodeJS.Timer;
+
+  public ping: number;
 
   public onopen = () => {};
   public onmessage = (message: string) => {};
   public onbinary = (buffer: ArrayBuffer) => {};
   public onclose = () => {};
 
-  constructor(url: string) {
-    console.log(`[WebHybridSocketClient] Connecting to ${url}...`);
+  constructor(url: string, pingInterval = 30000) {
     this.ws = new WebSocket(url);
 
     this.ws.onopen = () => {
-      console.log("[WebHybridSocketClient] WS connection established");
+      // console.log("[WebRTCClient] WS connection established");
+
+      this.pingTimer = setInterval(() => this.sendPing(), pingInterval);
+      this.sendPing();
     };
-
-    this.ws.onmessage = async ({ data }) => {
-      const config = JSON.parse(data);
-      this.createPeerConnection(config);
-    };
-
-    this.ws.onclose = () => {
-      console.log("[WebHybridSocketClient] WS connection lost");
-
-      if (this.pc) {
-        this.pc.close();
-      }
-
-      if (this.connected) {
-        this.onclose();
-      }
-    };
-
-    this.ws.onerror = (err) => {
-      console.log("[WebHybridSocketClient] WebSocket Error: ", err);
-    };
-  }
-
-  createPeerConnection(config: RTCConfiguration) {
-    this.pc = new RTCPeerConnection(config);
 
     this.ws.onmessage = async ({ data }) => {
       const msg = JSON.parse(data);
 
       switch (msg.type) {
+        case "config":
+          this.createPeerConnection(msg.config);
+          break;
         case "offer":
           await this.acceptOffer(msg.sdp);
           break;
@@ -64,20 +39,45 @@ export class WebHybridSocketClient {
             sdpMid: msg.mid,
           });
           break;
+        case "pong":
+          this.ping = performance.now() - this.pingSendTime;
+          break;
       }
     };
 
-    this.pc.onsignalingstatechange = () => {
-      // console.log(`[WebHybridSocketClient]`, this.pc.signalingState);
+    this.ws.onclose = () => {
+      if (this.pingTimer) {
+        clearInterval(this.pingTimer);
+      }
+
+      console.log("[WebRTCClient] WS connection lost");
     };
 
+    this.ws.onerror = (err) => {
+      console.log("[WebRTCClient] WebSocket Error: ", err);
+    };
+  }
+
+  private sendPing() {
+    this.pingSendTime = performance.now();
+    this.ws.send(JSON.stringify({ type: "ping", time: this.pingSendTime }));
+  }
+
+  createPeerConnection(config: RTCConfiguration) {
+    this.pc = new RTCPeerConnection(config);
+
+    /*
+    this.pc.onsignalingstatechange = () => {
+      if (this.pc.signalingState === "stable") {
+        this.onopen();
+      }
+    };
+    */
+
     this.pc.ondatachannel = ({ channel }) => {
-      this.dc = channel;
-      this.dc.binaryType = "arraybuffer";
-      this.ws.binaryType = "arraybuffer";
-      this.connected = true;
+      channel.binaryType = "arraybuffer";
 
-      this.ws.onmessage = ({ data }) => {
+      channel.onmessage = ({ data }) => {
         if (data instanceof ArrayBuffer) {
           return this.onbinary(data);
         }
@@ -85,20 +85,22 @@ export class WebHybridSocketClient {
         this.onmessage(data);
       };
 
-      this.dc.onmessage = ({ data }) => {
-        if (data instanceof ArrayBuffer) {
-          return this.onbinary(data);
-        }
+      switch (channel.label) {
+        case "reliable":
+          this.rc = channel;
+          break;
+        case "unreliable":
+          this.uc = channel;
+          break;
+      }
 
-        this.onmessage(data);
-      };
-
-      this.onopen();
+      // Connection is ready when both the reliable and the unreliable channels are open
+      if (this.rc && this.uc) {
+        this.onopen();
+      }
     };
 
     this.pc.onicecandidate = (ev) => {
-      // console.log("[WebHybridSocketClient]", ev.candidate);
-
       if (!ev.candidate) {
         return;
       }
@@ -127,20 +129,13 @@ export class WebHybridSocketClient {
     this.ws.send(JSON.stringify(this.pc.localDescription));
   }
 
-  reliable(message: string | ArrayBuffer) {
-    if (!this.connected) {
-      return;
-    }
-
-    this.ws.send(message);
+  sendR(message: string | ArrayBuffer) {
+    // @ts-ignore
+    this.rc.send(message);
   }
 
-  unreliable(message: string | ArrayBuffer) {
-    if (!this.connected) {
-      return;
-    }
-
+  sendU(message: string | ArrayBuffer) {
     // @ts-ignore
-    this.dc.send(message);
+    this.uc.send(message);
   }
 }

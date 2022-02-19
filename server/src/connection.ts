@@ -1,88 +1,68 @@
 import { DataChannel } from "node-datachannel";
-import { WebSocket } from "ws";
-import { WebHybridSocketServer } from "./server";
+import { WebRTCServer } from "./server";
 
-export class WebHybridSocketConnection {
-  public onmessage = (message: string, reliable: boolean) => {};
-  public onbinary = (arrayBuffer: ArrayBuffer, reliable: boolean) => {};
+export class WebRTCConnection {
+  public onmessage = (message: string) => {};
+  public onbinary = (arrayBuffer: ArrayBuffer) => {};
   public onclose = () => {};
 
   constructor(
-    private server: WebHybridSocketServer,
-    private ws: WebSocket,
-    private dc: DataChannel
+    private server: WebRTCServer,
+    public id: string,
+    private rc: DataChannel,
+    private uc: DataChannel
   ) {
-    ws.binaryType = "arraybuffer";
+    for (const channel of [rc, uc]) {
+      channel.onMessage((msg) => {
+        if (msg instanceof Buffer) {
+          return this.onbinary(msg.buffer);
+        }
 
-    ws.on("message", (message) => {
+        this.onmessage(msg);
+      });
+    }
+  }
+
+  private send(channel: DataChannel, message: string | ArrayBuffer) {
+    try {
+      if (message instanceof Buffer) {
+        return channel.sendMessageBinary(message);
+      }
+
       if (message instanceof ArrayBuffer) {
-        return this.onbinary(message, true);
+        return channel.sendMessageBinary(Buffer.from(message));
       }
 
-      return this.onmessage(message.toString(), true);
-    });
-
-    dc.onMessage((msg: string | Buffer) => {
-      if (msg instanceof Buffer) {
-        return this.onbinary(msg.buffer, false);
-      }
-
-      this.onmessage(msg, false);
-    });
-  }
-
-  reliable(message: string | ArrayBuffer) {
-    this.ws.send(message);
-    return true;
-  }
-
-  unreliable(message: string | ArrayBuffer) {
-    /*
-    if (message instanceof Buffer) {
-      return this.dc.sendMessageBinary(message);
+      return channel.sendMessage(message);
+    } catch (_) {
+      // sending message fails if channel is not open
+      return false;
     }
-    */
-
-    if (message instanceof ArrayBuffer) {
-      return this.dc.sendMessageBinary(Buffer.from(message));
-    }
-
-    return this.dc.sendMessage(message);
   }
 
-  send(message: string | ArrayBuffer, reliable: boolean) {
-    if (reliable) {
-      return this.reliable(message);
-    }
-
-    return this.unreliable(message);
+  sendR(message: string | ArrayBuffer) {
+    return this.send(this.rc, message);
   }
 
-  broadcastReliable(message: string | ArrayBuffer) {
+  sendU(message: string | ArrayBuffer) {
+    return this.send(this.uc, message);
+  }
+
+  private broadcast(channel: DataChannel, message: string | ArrayBuffer) {
     const connections = this.server.getConnections();
 
     for (const connection of connections) {
       if (this !== connection) {
-        connection.reliable(message);
+        connection.send(channel, message);
       }
     }
   }
 
-  broadcastUnreliable(message: string | ArrayBuffer) {
-    const connections = this.server.getConnections();
-
-    for (const connection of connections) {
-      if (this !== connection) {
-        connection.unreliable(message);
-      }
-    }
+  broadcastR(message: string | ArrayBuffer) {
+    return this.broadcast(this.rc, message);
   }
 
-  broadcast(message: string | ArrayBuffer, reliable: boolean) {
-    if (reliable) {
-      return this.broadcastReliable(message);
-    }
-
-    return this.broadcastUnreliable(message);
+  broadcastU(message: string | ArrayBuffer) {
+    return this.broadcast(this.rc, message);
   }
 }

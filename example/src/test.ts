@@ -2,7 +2,7 @@ import "./server";
 
 /*
 // Client polyfills
-import { WebHybridSocketClient } from "web-hybrid-socket-client";
+import { WebRTCClient } from "web-hybrid-socket-client";
 import { WebSocket } from "ws";
 import {
   RTCPeerConnection,
@@ -20,7 +20,7 @@ global.RTCSessionDescription = RTCSessionDescription;
 global.RTCIceCandidate = RTCIceCandidate;
 
 // Client 1
-const client1 = new WebHybridSocketClient();
+const client1 = new WebRTCClient();
 
 client1.onopen = () => {
   console.log(`[CLIENT1] connected`);
@@ -46,7 +46,7 @@ client1.onbinary = async (buffer) => {
 };
 
 // Client 2
-const client2 = new WebHybridSocketClient();
+const client2 = new WebRTCClient();
 
 client2.onopen = () => {
   console.log(`[CLIENT2] connected`);

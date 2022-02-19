@@ -1,38 +1,36 @@
-# Web Hybrid Socket Server
-
-## Install
+# WebRTC Server
 
 ```sh
-npm install @leede/web-hybrid-socket-server
+npm install @leede/webrtc-server
 ```
 
-## Basic usage
-
 ```ts
-import { WebHybridSocketServer } from "@leede/web-hybrid-socket-server";
+import { WebRTCServer } from "@leede/webrtc-server";
 
-const whss = new WebHybridSocketServer({
+const server = new WebRTCServer({
   port: 8000,
   iceServers: ["stun:stun.l.google.com:19302"],
 });
 
-whss.onconnection = (connection) => {
-  console.log("New connection");
+server.onconnection = async (connection) => {
+  console.log("[SERVER] New connection");
 
-  // Send a reliable TCP string message using WebSocket
-  connection.reliable("Hello over WebSocket");
+  // Send reliable messages
+  connection.sendR("Hello from server over TCP");
+  connection.sendR(new Float32Array([1.618, 1.414]).buffer);
 
-  // Send an unreliable UDP string message using WebRTC
-  connection.unreliable("Hello over WebRTC");
+  // Send unreliable messages
+  connection.sendU("Hello from server over UDP");
+  connection.sendU(Buffer.from([1, 4, 9, 16, 25, 36]));
 
   // Handle string messages from connection
   connection.onmessage = (message) => {
-    console.log(`Received: ${message}`);
+    console.log("[SERVER] Received message:", message);
   };
 
   // Handle binary messages from connection
   connection.onbinary = (buffer) => {
-    console.log(`Received buffer:`, buffer);
+    console.log("[SERVER] Received buffer:", buffer);
   };
 
   // Handle disconnection

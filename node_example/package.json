@@ -1,23 +1,30 @@
 {
-  "name": "@leede/web-hybrid-socket-node-example",
+  "name": "@leede/webrtc-node-example",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc-watch --onSuccess \"npm start\"",
+    "start": "run-p start:*",
+    "start:server": "node dist/node_demo_server.js",
+    "start:client": "node dist/node_demo_client.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/leede-org/web-hybrid-socket.git"
+    "url": "git+https://github.com/leede-org/webrtc-server-client.git"
   },
   "author": "Leede <info@leede.ee> (https://leede.ee)",
   "license": "MIT",
   "dependencies": {
-    "@leede/web-hybrid-socket-client": "file:../client",
-    "@leede/web-hybrid-socket-server": "file:../server"
+    "@leede/webrtc-client": "file:../client",
+    "@leede/webrtc-server": "file:../server",
+    "wrtc": "^0.4.7",
+    "ws": "^8.5.0"
   },
   "devDependencies": {
+    "npm-run-all": "^4.1.5",
     "tsc-watch": "^4.6.0",
     "typescript": "^4.5.5"
   }

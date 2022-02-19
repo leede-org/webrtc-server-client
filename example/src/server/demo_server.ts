@@ -1,9 +1,9 @@
 import * as http from "http";
 import * as express from "express";
 import * as path from "path";
-import { WebHybridSocketServer } from "@leede/web-hybrid-socket-server";
+import { WebRTCServer } from "@leede/webrtc-server";
 
-// http server
+// HTTP server
 const app = express();
 const server = new http.Server(app);
 
@@ -14,7 +14,7 @@ if (process.env.NODE_ENV !== "development") {
 }
 
 // Simple broadcasting server
-const whss = new WebHybridSocketServer({
+const wrtcServer = new WebRTCServer({
   server,
   iceServers: ["stun:stun.l.google.com:19302"],
   portRangeBegin: parseInt(process.env.PORT_RANGE_BEGIN || "0"),
@@ -24,7 +24,7 @@ const whss = new WebHybridSocketServer({
 let nextPlayerId = 1;
 const players = new Map<number, { name: string; color: string }>();
 
-whss.onconnection = (connection) => {
+wrtcServer.onconnection = async (connection) => {
   console.log(`[SERVER] New connection`);
 
   // Create a new player for this connection
@@ -42,7 +42,7 @@ whss.onconnection = (connection) => {
   players.set(id, player);
 
   // Reliably send all players and connection's player id to this connection
-  connection.reliable(
+  connection.sendR(
     JSON.stringify({
       event: "players",
       players: Object.fromEntries(players),
@@ -51,16 +51,12 @@ whss.onconnection = (connection) => {
   );
 
   // Reliably broadcast new player to all other connections
-  connection.broadcastReliable(
-    JSON.stringify({ event: "new-player", id, player })
-  );
+  connection.broadcastR(JSON.stringify({ event: "new-player", id, player }));
 
-  /*
   // Handle string messages from connection
   connection.onmessage = (json) => {
     const message = JSON.parse(json);
   };
-  */
 
   // Allocate a buffer that is broadcasted to everyone every time the connection sends an updated cursor position
   // The buffer contains 4 bytes for the player id and 2*2 bytes for UInt16 cursor x and y coordinates
@@ -78,13 +74,14 @@ whss.onconnection = (connection) => {
     broadcastBuffer.writeUInt16LE(player.cursor[1], 6);
 
     // The new cursor position is broadcasted to all connections, including the sender itself
-    whss.broadcastUnreliable(broadcastBuffer.buffer);
+    wrtcServer.broadcastU(broadcastBuffer.buffer);
   };
 
   // Remove player on disconnect
   connection.onclose = () => {
     players.delete(id);
-    whss.broadcastReliable(JSON.stringify({ event: "remove-player", id }));
+
+    wrtcServer.broadcastR(JSON.stringify({ event: "remove-player", id }));
   };
 };
 
