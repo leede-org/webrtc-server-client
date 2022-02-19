@@ -50,6 +50,8 @@ server.onconnection = (connection) => {
 
 ## Client-side usage
 
+### Using a bundler such as webpack or browserify
+
 When using a bundler such as webpack or browserify then import `WebRTCClient` from the `@leede/webrtc-client` package.
 
 ```sh
@@ -84,6 +86,8 @@ client.onbinary = (buffer) => {
 };
 ```
 
+### Using bundled script to use the client on a webpage globally
+
 Alternatively, the client can also be used by downloading `leede-webrtc-client.js` from the [releases page](https://github.com/leede-org/webrtc-server-client/releases) and including the script on a webpage. The script defines a global `Leede` namespace wherein the `WebRTCClient` class is.
 
 ```html
@@ -93,7 +97,13 @@ Alternatively, the client can also be used by downloading `leede-webrtc-client.j
 </script>
 ```
 
+### Using the client in Node.js
+
 The client can also be used in a Node.js context by providing some global variables from `ws` and `wrtc` packages.
+
+```sh
+npm install ws wrtc @leede/webrtc-server
+```
 
 ```ts
 const ws = require("ws");
