@@ -25,6 +25,7 @@ export class WebRTCClient {
 
     this.ws.onmessage = async ({ data }) => {
       const msg = JSON.parse(data);
+      console.log(msg);
 
       switch (msg.type) {
         case "config":
@@ -65,14 +66,6 @@ export class WebRTCClient {
 
   createPeerConnection(config: RTCConfiguration) {
     this.pc = new RTCPeerConnection(config);
-
-    /*
-    this.pc.onsignalingstatechange = () => {
-      if (this.pc.signalingState === "stable") {
-        this.onopen();
-      }
-    };
-    */
 
     this.pc.ondatachannel = ({ channel }) => {
       channel.binaryType = "arraybuffer";

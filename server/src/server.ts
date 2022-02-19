@@ -84,13 +84,28 @@ export class WebRTCServer {
         }
       });
 
-      pc.onLocalCandidate((candidate, mid) =>
-        ws.send(JSON.stringify({ type: "candidate", candidate, mid }))
-      );
+      // Don't send candidates until the description has been sent
+      let descriptionSent = false;
+      const candidatesQueue = [];
 
-      pc.onLocalDescription((sdp, type) =>
-        ws.send(JSON.stringify({ type, sdp }))
-      );
+      pc.onLocalCandidate((candidate, mid) => {
+        if (descriptionSent) {
+          ws.send(JSON.stringify({ type: "candidate", candidate, mid }));
+        } else {
+          candidatesQueue.push(
+            JSON.stringify({ type: "candidate", candidate, mid })
+          );
+        }
+      });
+
+      pc.onLocalDescription((sdp, type) => {
+        ws.send(JSON.stringify({ type, sdp }));
+        descriptionSent = true;
+
+        for (const candidateJson of candidatesQueue) {
+          ws.send(candidateJson);
+        }
+      });
 
       ws.send(clientRtcConfigurationJSON);
 

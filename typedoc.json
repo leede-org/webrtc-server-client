@@ -1,5 +1,5 @@
 {
-  "name": "WebRTC client-server",
+  "name": "WebRTC server-client",
   "readme": "none",
   "entryPointStrategy": "packages",
   "entryPoints": ["server", "client"],
