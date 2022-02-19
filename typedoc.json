@@ -1,0 +1,9 @@
+{
+  "name": "WebRTC client-server",
+  "readme": "none",
+  "entryPointStrategy": "packages",
+  "entryPoints": ["server", "client"],
+  "includeVersion": false,
+  "excludePrivate": true,
+  "excludeProtected": true
+}

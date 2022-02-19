@@ -4,13 +4,17 @@ The WebRTC server-client package provides a Node.js server that acts as a centra
 
 The client can be used in a browser as well as in a Node.js context.
 
-See a live demo at <https://leede.ee/nodejs/webrtc-server-client/>. The source code of the live demo is in the `example` directory in this repository.
+See a live demo at <https://webrtc-server-client.leede.ee/demo/>. The source code of the live demo is in the `example` directory in this repository.
 
-## Server-side usage
+## Server
+
+### Server installation
 
 ```sh
 npm install @leede/webrtc-server
 ```
+
+### Basic server usage example
 
 ```ts
 import { WebRTCServer } from "@leede/webrtc-server";
@@ -48,15 +52,54 @@ server.onconnection = (connection) => {
 };
 ```
 
-## Client-side usage
+## Client
 
-### Using a bundler such as webpack or browserify
+### Client installation
+
+#### Using a bundler such as webpack or browserify
 
 When using a bundler such as webpack or browserify then import `WebRTCClient` from the `@leede/webrtc-client` package.
 
 ```sh
 npm install @leede/webrtc-server
 ```
+
+```ts
+import { WebRTCClient } from "@leede/webrtc-client";
+```
+
+#### Using bundled script to use the client on a webpage globally
+
+The client can also be used by downloading `leede-webrtc-client.js` from the [releases page](https://github.com/leede-org/webrtc-server-client/releases) and including the script on a webpage. The script defines a global `leede` namespace wherein the `WebRTCClient` class is available.
+
+```html
+<script src="leede-webrtc-client.js"></script>
+<script>
+  const client = new leede.WebRTCClient("ws://localhost:8000");
+</script>
+```
+
+#### Using the client in Node.js
+
+The client can also be used in a Node.js context by providing some global variables from `ws` and `wrtc` packages.
+
+```sh
+npm install ws wrtc @leede/webrtc-server
+```
+
+```ts
+const ws = require("ws");
+const wrtc = require("wrtc");
+
+global.WebSocket = ws.WebSocket;
+global.RTCPeerConnection = wrtc.RTCPeerConnection;
+global.RTCSessionDescription = wrtc.RTCSessionDescription;
+
+// WebRTCClient can now be imported and used
+import { WebRTCClient } from "@leede/webrtc-client";
+```
+
+### Basic client usage example
 
 ```ts
 import { WebRTCClient } from "@leede/webrtc-client";
@@ -84,35 +127,4 @@ client.onmessage = (message) => {
 client.onbinary = (buffer) => {
   console.log("[CLIENT] Received buffer:", buffer);
 };
-```
-
-### Using bundled script to use the client on a webpage globally
-
-Alternatively, the client can also be used by downloading `leede-webrtc-client.js` from the [releases page](https://github.com/leede-org/webrtc-server-client/releases) and including the script on a webpage. The script defines a global `leede` namespace wherein the `WebRTCClient` class is.
-
-```html
-<script src="leede-webrtc-client.js"></script>
-<script>
-  const client = new leede.WebRTCClient("ws://localhost:8000");
-</script>
-```
-
-### Using the client in Node.js
-
-The client can also be used in a Node.js context by providing some global variables from `ws` and `wrtc` packages.
-
-```sh
-npm install ws wrtc @leede/webrtc-server
-```
-
-```ts
-const ws = require("ws");
-const wrtc = require("wrtc");
-
-global.WebSocket = ws.WebSocket;
-global.RTCPeerConnection = wrtc.RTCPeerConnection;
-global.RTCSessionDescription = wrtc.RTCSessionDescription;
-
-// WebRTCClient can now be imported and used
-import { WebRTCClient } from "@leede/webrtc-client";
 ```
