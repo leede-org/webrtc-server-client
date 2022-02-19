@@ -20,7 +20,7 @@ const server = new WebRTCServer({
   iceServers: ["stun:stun.l.google.com:19302"],
 });
 
-server.onconnection = async (connection) => {
+server.onconnection = (connection) => {
   console.log("[SERVER] New connection");
 
   // Send reliable messages

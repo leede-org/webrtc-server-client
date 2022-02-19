@@ -24,7 +24,7 @@ const wrtcServer = new WebRTCServer({
 let nextPlayerId = 1;
 const players = new Map<number, { name: string; color: string }>();
 
-wrtcServer.onconnection = async (connection) => {
+wrtcServer.onconnection = (connection) => {
   console.log(`[SERVER] New connection`);
 
   // Create a new player for this connection
