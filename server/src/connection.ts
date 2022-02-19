@@ -48,21 +48,23 @@ export class WebRTCConnection {
     return this.send(this.uc, message);
   }
 
-  private broadcast(channel: DataChannel, message: string | ArrayBuffer) {
+  broadcastR(message: string | ArrayBuffer) {
     const connections = this.server.getConnections();
 
     for (const connection of connections) {
-      if (this !== connection) {
-        connection.send(channel, message);
+      if (this.id !== connection.id) {
+        connection.sendR(message);
       }
     }
   }
 
-  broadcastR(message: string | ArrayBuffer) {
-    return this.broadcast(this.rc, message);
-  }
-
   broadcastU(message: string | ArrayBuffer) {
-    return this.broadcast(this.rc, message);
+    const connections = this.server.getConnections();
+
+    for (const connection of connections) {
+      if (this.id !== connection.id) {
+        connection.sendU(message);
+      }
+    }
   }
 }

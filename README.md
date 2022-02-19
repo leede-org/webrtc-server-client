@@ -88,12 +88,12 @@ client.onbinary = (buffer) => {
 
 ### Using bundled script to use the client on a webpage globally
 
-Alternatively, the client can also be used by downloading `leede-webrtc-client.js` from the [releases page](https://github.com/leede-org/webrtc-server-client/releases) and including the script on a webpage. The script defines a global `Leede` namespace wherein the `WebRTCClient` class is.
+Alternatively, the client can also be used by downloading `leede-webrtc-client.js` from the [releases page](https://github.com/leede-org/webrtc-server-client/releases) and including the script on a webpage. The script defines a global `leede` namespace wherein the `WebRTCClient` class is.
 
 ```html
 <script src="leede-webrtc-client.js"></script>
 <script>
-  const client = new Leede.WebRTCClient("ws://localhost:8000");
+  const client = new leede.WebRTCClient("ws://localhost:8000");
 </script>
 ```
 

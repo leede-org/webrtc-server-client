@@ -80,7 +80,6 @@ wrtcServer.onconnection = (connection) => {
   // Remove player on disconnect
   connection.onclose = () => {
     players.delete(id);
-
     wrtcServer.broadcastR(JSON.stringify({ event: "remove-player", id }));
   };
 };

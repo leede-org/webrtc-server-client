@@ -1,8 +1,4 @@
-import {
-  DataChannelInitConfig,
-  IceServer,
-  PeerConnection,
-} from "node-datachannel";
+import { IceServer, PeerConnection } from "node-datachannel";
 import { WebSocketServer } from "ws";
 import * as http from "http";
 import { WebRTCConnection } from "./connection";
@@ -120,6 +116,7 @@ export class WebRTCServer {
               reliableChannel,
               unreliableChannel
             );
+
             this.connections.set(id, connection);
             this.onconnection(connection);
           }

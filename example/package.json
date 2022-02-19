@@ -11,7 +11,8 @@
     "build": "tsc && webpack",
     "dev": "run-p dev:*",
     "dev:client": "webpack serve --open",
-    "dev:server": "tsc-watch --onSuccess \"node dist/server/demo_server.js\""
+    "dev:server": "tsc-watch --onSuccess \"node dist/server/demo_server.js\"",
+    "start": "node dist/server/demo_server.js"
   },
   "repository": {
     "type": "git",
