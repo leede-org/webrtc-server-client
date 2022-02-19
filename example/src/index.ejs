@@ -1,34 +1,155 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>webrtc-server-client-example</title>
+    <title>WebRTC server-client by Leede</title>
     <style>
+      html,
+      body,
+      h2 {
+        margin: 0;
+        box-sizing: border-box;
+        font-family: Verdana, Geneva, sans-serif;
+      }
+
+      *,
+      *:before,
+      *:after {
+        box-sizing: inherit;
+      }
+
+      body,
+      html,
       canvas {
-        width: 600px;
-        height: 400px;
-        border: 1px solid black;
+        height: 100%;
+      }
+
+      body {
+        background: #f5f5f5;
+      }
+
+      canvas {
+        position: absolute;
+        display: block;
+        width: 100%;
+      }
+
+      a,
+      a:visited,
+      a:focus {
+        color: #1565c0;
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: #003c8f;
+        text-decoration: underline;
+      }
+
+      main,
+      footer {
+        display: grid;
+        grid-template-columns: 1fr;
+        place-content: center;
+        gap: 1rem;
+      }
+
+      main {
+        min-height: 100%;
+        margin: 0 auto;
+        padding: 1rem;
+        max-width: 1200px;
+      }
+
+      footer {
+        text-align: center;
+        background: #eeeeee;
+        color: #e0e0e0;
+        min-height: 128px;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      footer a {
+        margin-right: 1.5rem;
+      }
+
+      footer a:last-child {
+        margin-right: 0;
+      }
+
+      @media only screen and (min-width: 720px) {
+        main {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid #e0e0e0;
+      }
+
+      table {
+        margin-top: 1rem;
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+      }
+
+      th {
+        background: #f5f5f5;
+      }
+
+      th,
+      td {
+        padding: 0.75rem;
+      }
+
+      .box {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.05);
       }
     </style>
   </head>
   <body>
-    <h1>Demo</h1>
-    <p>
-      Try opening this page in multiple browser windows. The cursor positions of
-      all connected clients within the canvas are synced using an unreliable
-      data channel with the server acting as a central peer for all clients. The
-      list of players is synced using a separate reliable data channel.
-    </p>
     <canvas></canvas>
-    <h2>Players</h2>
-    <table id="players">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Color</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <main>
+      <div class="box">
+        <h2>Demo</h2>
+        <p>
+          Try opening this page in multiple browser windows. The cursor
+          positions of all connected clients within the canvas are synced using
+          an unreliable data channel with the server acting as a central peer
+          for all clients. The list of players is synced using a separate
+          reliable data channel.
+        </p>
+      </div>
+      <div class="box">
+        <h2>Players</h2>
+        <table id="players">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Color</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </main>
+
+    <footer>
+      <div>
+        <a href="https://leede.ee/">Project by Leede</a>
+        <a href="https://github.com/leede-org/webrtc-server-client">
+          View on GitHub</a
+        >
+        <a href="https://github.com/leede-org/webrtc-server-client">
+          Sponsor the project</a
+        >
+      </div>
+    </footer>
   </body>
 </html>
