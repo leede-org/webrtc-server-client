@@ -1,4 +1,5 @@
 const path = require("path");
+const package = require("./package.json");
 
 module.exports = {
   mode: process.env.NODE_ENV === "production" ? "production" : "development",
@@ -7,7 +8,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "[name].js",
+    filename: `[name]-${package.version}.js`,
     libraryTarget: "umd",
     library: "leede",
     umdNamedDefine: true,

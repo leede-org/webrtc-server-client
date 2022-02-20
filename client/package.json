@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && webpack",
+    "build": "rimraf dist/ && tsc && webpack",
     "dev": "tsc-watch"
   },
   "repository": {
@@ -19,6 +19,7 @@
   "author": "Leede <info@leede.ee> (https://leede.ee)",
   "license": "MIT",
   "devDependencies": {
+    "rimraf": "^3.0.2",
     "ts-loader": "^9.2.6",
     "tsc-watch": "^4.6.0",
     "typescript": "^4.5.5",
