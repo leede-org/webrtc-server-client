@@ -1,3 +1,4 @@
+import "./index.css";
 import { WebRTCClient } from "@leede/webrtc-client";
 
 const client = new WebRTCClient(
