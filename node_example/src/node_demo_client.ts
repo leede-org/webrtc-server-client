@@ -11,7 +11,7 @@ import { WebRTCClient } from "@leede/webrtc-client";
 
 const client = new WebRTCClient("ws://localhost:8000");
 
-client.onopen = () => {
+client.on("open", () => {
   console.log("[CLIENT] Connected");
 
   // Send reliable TCP messages
@@ -21,14 +21,14 @@ client.onopen = () => {
   // Send unreliable UDP messages
   client.sendU("Hello from client over UDP");
   client.sendU(Buffer.from([0, 1, 1, 2, 3, 5, 8, 13, 21, 34]));
-};
+});
 
 // Handle string messages from server
-client.onmessage = (message) => {
+client.on("message", (message) => {
   console.log("[CLIENT] Received message:", message);
-};
+});
 
 // Handle binary messages from server
-client.onbinary = (buffer) => {
+client.on("binary", (buffer) => {
   console.log("[CLIENT] Received buffer:", buffer);
-};
+});

@@ -1,4 +1,29 @@
-export class WebRTCClient {
+import { EventEmitter } from "events";
+
+export declare interface WebRTCClient {
+  on(event: "open", listener: () => void): this;
+  on(event: "close", listener: () => void): this;
+  on(event: "error", listener: (error: Error) => void): this;
+  on(event: "message", listener: (message: string) => void): this;
+  on(event: "binary", listener: (buffer: ArrayBuffer) => void): this;
+
+  off(event: string, listener: (...args: any[]) => void): this;
+
+  /** @internal */
+  emit(event: "open"): boolean;
+  /** @internal */
+  emit(event: "close"): boolean;
+  /** @internal */
+  emit(event: "error", error: Error): boolean;
+  /** @internal */
+  emit(event: "message", message: string): boolean;
+  /** @internal */
+  emit(event: "binary", buffer: ArrayBuffer): boolean;
+}
+
+export class WebRTCClient extends EventEmitter {
+  public ping: number;
+
   private ws: WebSocket;
   private pc: RTCPeerConnection;
   private rc: RTCDataChannel;
@@ -6,14 +31,8 @@ export class WebRTCClient {
   private pingSendTime: number;
   private pingTimer: NodeJS.Timer;
 
-  public ping: number;
-
-  public onopen = () => {};
-  public onmessage = (message: string) => {};
-  public onbinary = (buffer: ArrayBuffer) => {};
-  public onclose = () => {};
-
   constructor(url: string, pingInterval = 30000) {
+    super();
     this.ws = new WebSocket(url);
 
     this.ws.onopen = () => {
@@ -25,7 +44,6 @@ export class WebRTCClient {
 
     this.ws.onmessage = async ({ data }) => {
       const msg = JSON.parse(data);
-      console.log(msg);
 
       switch (msg.type) {
         case "config":
@@ -51,11 +69,12 @@ export class WebRTCClient {
         clearInterval(this.pingTimer);
       }
 
-      console.log("[WebRTCClient] WS connection lost");
+      // console.log("[WebRTCClient] WS connection lost");
     };
 
     this.ws.onerror = (err) => {
-      console.log("[WebRTCClient] WebSocket Error: ", err);
+      //console.log("[WebRTCClient] WebSocket Error: ", err);
+      this.emit("error", new Error(`Unable to connect to ${url}`));
     };
   }
 
@@ -64,7 +83,7 @@ export class WebRTCClient {
     this.ws.send(JSON.stringify({ type: "ping", time: this.pingSendTime }));
   }
 
-  createPeerConnection(config: RTCConfiguration) {
+  private createPeerConnection(config: RTCConfiguration) {
     this.pc = new RTCPeerConnection(config);
 
     this.pc.ondatachannel = ({ channel }) => {
@@ -72,10 +91,10 @@ export class WebRTCClient {
 
       channel.onmessage = ({ data }) => {
         if (data instanceof ArrayBuffer) {
-          return this.onbinary(data);
+          return this.emit("binary", data);
         }
 
-        this.onmessage(data);
+        this.emit("message", data);
       };
 
       switch (channel.label) {
@@ -89,7 +108,7 @@ export class WebRTCClient {
 
       // Connection is ready when both the reliable and the unreliable channels are open
       if (this.rc && this.uc) {
-        this.onopen();
+        this.emit("open");
       }
     };
 
@@ -108,7 +127,7 @@ export class WebRTCClient {
     };
   }
 
-  async acceptOffer(sdp: string) {
+  private async acceptOffer(sdp: string) {
     await this.pc.setRemoteDescription({ type: "offer", sdp });
 
     const originalAnswer = await this.pc.createAnswer();

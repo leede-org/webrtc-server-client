@@ -1,6 +1,7 @@
 import { IceServer, PeerConnection } from "node-datachannel";
 import { WebSocketServer } from "ws";
 import * as http from "http";
+import { EventEmitter } from "events";
 import { WebRTCConnection } from "./connection";
 
 export interface WebRTCServerOptions {
@@ -11,9 +12,18 @@ export interface WebRTCServerOptions {
   portRangeEnd?: number;
 }
 
-export class WebRTCServer {
-  public onconnection = (connection: WebRTCConnection) => {};
+export declare interface WebRTCServer {
+  on(
+    event: "connection",
+    listener: (connection: WebRTCConnection) => void
+  ): this;
+  off(event: string, listener: (...args: any[]) => void): this;
 
+  /** @internal */
+  emit(event: "connection", connection: WebRTCConnection): boolean;
+}
+
+export class WebRTCServer extends EventEmitter {
   private nextConnectionId = 1;
   private connections = new Map<string, WebRTCConnection>();
 
@@ -36,6 +46,8 @@ export class WebRTCServer {
   }
 
   constructor(private options: WebRTCServerOptions) {
+    super();
+
     const wss = new WebSocketServer({
       port: options.port,
       server: options.server,
@@ -61,7 +73,7 @@ export class WebRTCServer {
       pc.onStateChange((state) => {
         switch (state) {
           case "disconnected":
-            this.connections.get(id)?.onclose();
+            this.connections.get(id)?.emit("close");
             this.connections.delete(id);
             break;
         }
@@ -133,7 +145,7 @@ export class WebRTCServer {
             );
 
             this.connections.set(id, connection);
-            this.onconnection(connection);
+            this.emit("connection", connection);
           }
         });
       }

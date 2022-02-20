@@ -1,24 +1,39 @@
 import { DataChannel } from "node-datachannel";
+import { EventEmitter } from "events";
 import { WebRTCServer } from "./server";
 
-export class WebRTCConnection {
-  public onmessage = (message: string) => {};
-  public onbinary = (arrayBuffer: ArrayBuffer) => {};
-  public onclose = () => {};
+export declare interface WebRTCConnection {
+  on(event: "close", listener: () => void): this;
+  on(event: "message", listener: (message: string) => void): this;
+  on(event: "binary", listener: (buffer: ArrayBuffer) => void): this;
 
+  off(event: string, listener: (...args: any[]) => void): this;
+
+  /** @internal */
+  emit(event: "close"): boolean;
+  /** @internal */
+  emit(event: "message", message: string): boolean;
+  /** @internal */
+  emit(event: "binary", buffer: ArrayBuffer): boolean;
+}
+
+export class WebRTCConnection extends EventEmitter {
+  /** @internal */
   constructor(
     private server: WebRTCServer,
     public id: string,
     private rc: DataChannel,
     private uc: DataChannel
   ) {
+    super();
+
     for (const channel of [rc, uc]) {
       channel.onMessage((msg) => {
         if (msg instanceof Buffer) {
-          return this.onbinary(msg.buffer);
+          return this.emit("binary", msg.buffer);
         }
 
-        this.onmessage(msg);
+        this.emit("message", msg);
       });
     }
   }

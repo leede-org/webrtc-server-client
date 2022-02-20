@@ -18,7 +18,7 @@ const server = new WebRTCServer({
   iceServers: ["stun:stun.l.google.com:19302"],
 });
 
-server.onconnection = (connection) => {
+server.on("connection", (connection) => {
   console.log("[SERVER] New connection");
 
   // Send reliable messages
@@ -30,20 +30,20 @@ server.onconnection = (connection) => {
   connection.sendU(Buffer.from([1, 4, 9, 16, 25, 36]));
 
   // Handle string messages from connection
-  connection.onmessage = (message) => {
+  connection.on("message", (message) => {
     console.log("[SERVER] Received message:", message);
-  };
+  });
 
   // Handle binary messages from connection
-  connection.onbinary = (buffer) => {
+  connection.on("binary", (buffer) => {
     console.log("[SERVER] Received buffer:", buffer);
-  };
+  });
 
   // Handle disconnection
-  connection.onclose = () => {
+  connection.on("close", () => {
     console.log("Connection closed");
-  };
-};
+  });
+});
 ```
 
 For detailed usage, see the [server documentation](https://webrtc-server-client.leede.ee/docs/modules/_leede_webrtc_server.html).

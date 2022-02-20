@@ -24,7 +24,7 @@ const wrtcServer = new WebRTCServer({
 let nextPlayerId = 1;
 const players = new Map<number, { name: string; color: string }>();
 
-wrtcServer.onconnection = (connection) => {
+wrtcServer.on("connection", (connection) => {
   console.log(`[SERVER] New connection`);
 
   // Create a new player for this connection
@@ -54,9 +54,9 @@ wrtcServer.onconnection = (connection) => {
   connection.broadcastR(JSON.stringify({ event: "new-player", id, player }));
 
   // Handle string messages from connection
-  connection.onmessage = (json) => {
+  connection.on("message", (json) => {
     const message = JSON.parse(json);
-  };
+  });
 
   // Allocate a buffer that is broadcasted to everyone every time the connection sends an updated cursor position
   // The buffer contains 4 bytes for the player id and 2*2 bytes for UInt16 cursor x and y coordinates
@@ -66,7 +66,7 @@ wrtcServer.onconnection = (connection) => {
   broadcastBuffer.writeUInt32LE(id, 0);
 
   // Handle binary messages from connection
-  connection.onbinary = (buffer) => {
+  connection.on("binary", (buffer) => {
     player.cursor = new Uint16Array(buffer);
 
     // The last 4 bytes contain the x and y cursor positions
@@ -75,14 +75,14 @@ wrtcServer.onconnection = (connection) => {
 
     // The new cursor position is broadcasted to all connections, including the sender itself
     wrtcServer.broadcastU(broadcastBuffer.buffer);
-  };
+  });
 
   // Remove player on disconnect
-  connection.onclose = () => {
+  connection.on("close", () => {
     players.delete(id);
     wrtcServer.broadcastR(JSON.stringify({ event: "remove-player", id }));
-  };
-};
+  });
+});
 
 // Bind to configured port
 const port = process.env.PORT || 8000;
