@@ -1,7 +1,15 @@
 {
   "name": "@leede/webrtc-client",
   "version": "1.0.0",
-  "description": "",
+  "description": "WebRTC client library for connecting to @leede/webrtc-server",
+  "keywords": [
+    "webrtc",
+    "tcp",
+    "udp",
+    "websocket",
+    "broadcast",
+    "connection"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

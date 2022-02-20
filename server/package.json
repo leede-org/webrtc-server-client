@@ -1,7 +1,15 @@
 {
   "name": "@leede/webrtc-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Central peer server for WebRTC connections for reliable and unreliable messaging",
+  "keywords": [
+    "webrtc",
+    "tcp",
+    "udp",
+    "websocket",
+    "broadcast",
+    "connection"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

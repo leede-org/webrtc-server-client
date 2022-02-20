@@ -72,7 +72,7 @@ import { WebRTCClient } from "@leede/webrtc-client";
 
 #### Using bundled script to use the client on a webpage globally
 
-The client can also be used by downloading `leede-webrtc-client.js` from the [releases page](https://github.com/leede-org/webrtc-server-client/releases) and including the script on a webpage. The script defines a global `leede` namespace wherein the `WebRTCClient` class is available.
+The client can also be used by downloading `leede-webrtc-client-*.js` from the [releases listing](https://webrtc-server-client.leede.ee/releases/) and including the script on a webpage. The script defines a global `leede` namespace wherein the `WebRTCClient` class is available.
 
 ```html
 <script src="leede-webrtc-client.js"></script>

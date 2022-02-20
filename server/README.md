@@ -1,5 +1,7 @@
 # WebRTC Server
 
+The package provides a Node.js server that acts as a central peer for WebRTC connections. This is beneficial in use-cases where the reliable and ordered messaging of the WebSocket protocol is a limiting factor, such as web-based multiplayer games. The server sets up two data channels for each incoming connection - one for reliable messaging and another one for unreliable messaging. This allows for applications to use a unified messaging mechanism to implement features that require either reliable transports such as a chat room or unreliable transports such as syncing game state.
+
 Check out the [live demo](https://webrtc-server-client.leede.ee/demo/) or the [documentation](https://webrtc-server-client.leede.ee/docs/).
 
 ## Server installation
