@@ -9,7 +9,7 @@
     "example/dist"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha -r ts-node/register 'tests/**/*.ts'",
     "postinstall": "run-s install:*",
     "install:client": "npm --prefix ./client install ./client",
     "install:server": "npm --prefix ./server install ./server",
@@ -35,8 +35,15 @@
   },
   "homepage": "https://github.com/Leede-OU/webrtc-server-client#readme",
   "devDependencies": {
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^9.1.0",
+    "chai": "^4.3.6",
     "css-loader": "^6.6.0",
+    "mocha": "^9.2.1",
     "npm-run-all": "^4.1.5",
-    "typedoc": "^0.22.11"
+    "ts-node": "^10.5.0",
+    "typedoc": "^0.22.11",
+    "wrtc": "^0.4.7",
+    "ws": "^8.5.0"
   }
 }

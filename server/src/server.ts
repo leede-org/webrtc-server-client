@@ -67,6 +67,7 @@ export declare interface WebRTCServer {
 export class WebRTCServer extends EventEmitter {
   private nextConnectionId = 1;
   private connections = new Map<string, WebRTCConnection>();
+  private wss: WebSocketServer;
 
   /**
    * The server can be started by either binding to a specific TCP port or by providing an instance of the `http.Server` class. In addition, you also need to provide
@@ -118,17 +119,14 @@ export class WebRTCServer extends EventEmitter {
   constructor(private options: WebRTCServerOptions) {
     super();
 
-    const wss = new WebSocketServer({
+    this.wss = new WebSocketServer({
       port: options.port,
       server: options.server,
     });
 
-    const clientRtcConfigurationJSON = JSON.stringify({
-      type: "config",
-      config: this.getClientRtcConfiguration(),
-    });
+    const clientRtcConfiguration = this.getClientRtcConfiguration();
 
-    wss.on("connection", (ws) => {
+    this.wss.on("connection", (ws) => {
       // Generate unique ID
       const id = (this.nextConnectionId++).toString();
 
@@ -189,7 +187,13 @@ export class WebRTCServer extends EventEmitter {
         }
       });
 
-      ws.send(clientRtcConfigurationJSON);
+      ws.send(
+        JSON.stringify({
+          type: "config",
+          id,
+          config: clientRtcConfiguration,
+        })
+      );
 
       // Set up a reliable and an unreliable data channel
       let readyState = 0;
@@ -210,6 +214,8 @@ export class WebRTCServer extends EventEmitter {
             const connection = new WebRTCConnection(
               this,
               id,
+              ws,
+              pc,
               reliableChannel,
               unreliableChannel
             );
@@ -265,6 +271,15 @@ export class WebRTCServer extends EventEmitter {
   }
 
   /**
+   * Get a connection by id.
+   * @param id
+   * @returns
+   */
+  getConnection(id: string) {
+    return this.connections.get(id);
+  }
+
+  /**
    * Get the iterator for all connections to the server.
    *
    * ```ts
@@ -279,5 +294,15 @@ export class WebRTCServer extends EventEmitter {
    */
   getConnections() {
     return this.connections.values();
+  }
+
+  close() {
+    const connections = this.getConnections();
+
+    for (const connection of connections) {
+      connection.close();
+    }
+
+    this.wss.close();
   }
 }

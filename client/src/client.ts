@@ -5,7 +5,7 @@ export declare interface WebRTCClient {
   on(event: "close", listener: () => void): this;
   on(event: "error", listener: (error: Error) => void): this;
   on(event: "message", listener: (message: string) => void): this;
-  on(event: "binary", listener: (buffer: ArrayBuffer) => void): this;
+  on(event: "binary", listener: (arrayBuffer: ArrayBuffer) => void): this;
 
   off(event: string, listener: (...args: any[]) => void): this;
 
@@ -18,7 +18,7 @@ export declare interface WebRTCClient {
   /** @internal */
   emit(event: "message", message: string): boolean;
   /** @internal */
-  emit(event: "binary", buffer: ArrayBuffer): boolean;
+  emit(event: "binary", arrayBuffer: ArrayBuffer): boolean;
 }
 
 /**
@@ -49,6 +49,7 @@ export declare interface WebRTCClient {
  * ```
  */
 export class WebRTCClient extends EventEmitter {
+  public id: string;
   /**
    * The latest round-trip time of the ping to the server. This is updated with the interval set by `pingIntervalMs` in the {@link constructor}.
    */
@@ -87,6 +88,7 @@ export class WebRTCClient extends EventEmitter {
 
       switch (msg.type) {
         case "config":
+          this.id = msg.id;
           this.createPeerConnection(msg.config);
           break;
         case "offer":
@@ -108,8 +110,6 @@ export class WebRTCClient extends EventEmitter {
       if (this.pingTimer) {
         clearInterval(this.pingTimer);
       }
-
-      // console.log("[WebRTCClient] WS connection lost");
     };
 
     this.ws.onerror = (err) => {
@@ -197,5 +197,12 @@ export class WebRTCClient extends EventEmitter {
   sendU(message: string | ArrayBuffer) {
     // @ts-ignore
     this.uc.send(message);
+  }
+
+  close() {
+    this.ws.close();
+    this.rc.close();
+    this.uc.close();
+    this.pc.close();
   }
 }

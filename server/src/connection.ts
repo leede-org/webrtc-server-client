@@ -1,11 +1,12 @@
-import { DataChannel } from "node-datachannel";
+import { DataChannel, PeerConnection } from "node-datachannel";
 import { EventEmitter } from "events";
+import { WebSocket } from "ws";
 import { WebRTCServer } from "./server";
 
 export declare interface WebRTCConnection {
   on(event: "close", listener: () => void): this;
   on(event: "message", listener: (message: string) => void): this;
-  on(event: "binary", listener: (buffer: ArrayBuffer) => void): this;
+  on(event: "binary", listener: (arrayBuffer: ArrayBuffer) => void): this;
 
   off(event: string, listener: (...args: any[]) => void): this;
 
@@ -14,7 +15,7 @@ export declare interface WebRTCConnection {
   /** @internal */
   emit(event: "message", message: string): boolean;
   /** @internal */
-  emit(event: "binary", buffer: ArrayBuffer): boolean;
+  emit(event: "binary", arrayBuffer: ArrayBuffer): boolean;
 }
 
 export class WebRTCConnection extends EventEmitter {
@@ -22,6 +23,8 @@ export class WebRTCConnection extends EventEmitter {
   constructor(
     private server: WebRTCServer,
     public id: string,
+    private ws: WebSocket,
+    private pc: PeerConnection,
     private rc: DataChannel,
     private uc: DataChannel
   ) {
@@ -99,5 +102,12 @@ export class WebRTCConnection extends EventEmitter {
         connection.sendU(message);
       }
     }
+  }
+
+  close() {
+    this.ws.close();
+    this.rc.close();
+    this.uc.close();
+    this.pc.close();
   }
 }

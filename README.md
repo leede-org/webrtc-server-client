@@ -157,3 +157,94 @@ wrc.on("binary", (buffer) => {
 ```
 
 For detailed usage, see the [client documentation](https://webrtc-server-client.leede.ee/docs/modules/_leede_webrtc_client.html).
+
+## Binary messaging
+
+This library uses the `"arraybuffer"` type for binary messaging but it does not limit the types of messages that can be passed between the server and client in any way. Here are some examples for how various types of data can be passed between `WebRTCServer` and `WebRTCClient`.
+
+### Sending and receiving typed arrays
+
+#### Send and receive typed arrays in the server
+
+```ts
+wrs.on("connection", (connection) => {
+  // Send typed array to client
+  const float32ArrayFromServer = new Float32Array([3.14, 1.618]);
+  connection.sendR(float32ArrayFromServer.buffer);
+
+  // Receive typed array from client (see what client is sending below)
+  connection.on("binary", (arrayBuffer) => {
+    const uint16ArrayFromClient = new Uint16Array(arrayBuffer);
+    console.log(uint16ArrayFromClient); // Uint16Array([33, 45])
+  });
+});
+```
+
+#### Send and receive typed arrays in the client
+
+```ts
+wrc.on("open", () => {
+  // Send typed array to server
+  const uint16ArrayFromClient = new Uint16Array([33, 45]);
+  wrc.sendR(uint16ArrayFromClient.buffer);
+});
+
+// Receive typed array from server (see what server is sending above)
+wrc.on("binary", (arrayBuffer) => {
+  const float32ArrayFromServer = new Float32Array(arrayBuffer);
+  console.log(float32ArrayFromServer); // Float32Array([3.14, 1.618])
+});
+```
+
+### Sending and receiving generic binary data
+
+#### Send and receive generic binary data in the server
+
+```ts
+// Server
+wrs.on("connection", (connection) => {
+  // Send buffer to client
+  const buffer = Buffer.alloc(6);
+  buf.writeUint8(50, 0);
+  buf.writeUint8(125, 1);
+  buf.writeFloatLE(1.47, 2);
+  connection.sendR(buffer);
+
+  // Receive buffer from client (see what client is sending below)
+  connection.on("binary", (arrayBuffer) => {
+    const buffer = Buffer.from(arrayBuffer);
+    console.log(buffer.readFloatLE(0)); // 3.14
+    console.log(buffer.readUint32LE(4)); // 1234
+    console.log(buffer.readUint16LE(8)); // 600
+  });
+});
+```
+
+#### Send and receive generic binary data in the client
+
+As there is no native `Buffer` implementation in browsers as there is in Node.js then you can manipulate a `Uint8Array` to exchange binary data with the server. Alternatively, you can install and use the `buffer` package to exchange data more comfortably.
+
+```sh
+npm install buffer
+```
+
+```ts
+import { Buffer } from "buffer";
+
+wrc.on("open", () => {
+  // Send buffer to server
+  const buffer = Buffer.alloc(10);
+  buf.writeFloatLE(3.14, 0);
+  buf.writeUint32LE(1234, 4);
+  buf.writeUint16LE(600, 8);
+  wrc.sendR(buffer);
+});
+
+// Receive buffer from server (see what server is sending above)
+wrc.on("binary", (arrayBuffer) => {
+  const buffer = Buffer.from(arrayBuffer);
+  console.log(buffer.readUint8(0)); // 50
+  console.log(buffer.readUint8(1)); // 125
+  console.log(buffer.readFloatLE(2)); // 1.47
+});
+```
