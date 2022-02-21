@@ -6,5 +6,6 @@
   "excludePrivate": true,
   "excludeProtected": true,
   "excludeExternals": true,
-  "excludeInternal": true
+  "excludeInternal": true,
+  "sort": ["source-order"]
 }

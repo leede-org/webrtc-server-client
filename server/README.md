@@ -15,12 +15,12 @@ npm install @leede/webrtc-server
 ```ts
 import { WebRTCServer } from "@leede/webrtc-server";
 
-const server = new WebRTCServer({
+const wrs = new WebRTCServer({
   port: 8000,
   iceServers: ["stun:stun.l.google.com:19302"],
 });
 
-server.on("connection", (connection) => {
+wrs.on("connection", (connection) => {
   console.log("[SERVER] New connection");
 
   // Send reliable messages
@@ -49,3 +49,28 @@ server.on("connection", (connection) => {
 ```
 
 For detailed usage, see the [server documentation](https://webrtc-server-client.leede.ee/docs/modules/_leede_webrtc_server.html).
+
+## Running the server alongside an express app
+
+Instead of binding the `WebRTCServer` to a specific port, you can alternatively provide an instance of the `http.Server` class. This allows you to bind an express application and serve HTTP requests on the same server.
+
+```ts
+import * as http from "http";
+import * as express from "express";
+
+const app = express();
+const httpServer = new http.Server(app);
+
+app.get("/", (req, res) => res.send("Hello, world!"));
+
+const wrs = new WebRTCServer({
+  server: httpServer,
+  iceServers: ["stun:stun.l.google.com:19302"],
+});
+
+wrs.on("connection", (connection) => {
+  // ...
+});
+
+httpServer.listen(8000);
+```

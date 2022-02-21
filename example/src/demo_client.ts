@@ -1,7 +1,7 @@
 import "./index.css";
 import { WebRTCClient } from "@leede/webrtc-client";
 
-const client = new WebRTCClient(
+const wrc = new WebRTCClient(
   // @ts-ignore
   process.env.SERVER_URL || `ws://${location.hostname}:${location.port}`
 );
@@ -13,16 +13,16 @@ let players = {};
 let myId: number;
 
 // Start sending cursor position once connected to cursors channel
-client.on("open", () => {
+wrc.on("open", () => {
   canvas.addEventListener("mousemove", (ev) => {
     if (myId) {
-      client.sendU(new Uint16Array([ev.offsetX, ev.offsetY]).buffer);
+      wrc.sendU(new Uint16Array([ev.offsetX, ev.offsetY]).buffer);
     }
   });
 });
 
 // Handle string messages
-client.on("message", (json) => {
+wrc.on("message", (json) => {
   const message = JSON.parse(json);
   console.log("[MESSAGE]", message);
 
@@ -50,7 +50,7 @@ client.on("message", (json) => {
 });
 
 // Handle binary messages
-client.on("binary", (buffer) => {
+wrc.on("binary", (buffer) => {
   const id = new Uint32Array(buffer.slice(0, 4));
   const player = players[id + ""];
 

@@ -19,12 +19,12 @@ npm install @leede/webrtc-server
 ```ts
 import { WebRTCServer } from "@leede/webrtc-server";
 
-const server = new WebRTCServer({
+const wrs = new WebRTCServer({
   port: 8000,
   iceServers: ["stun:stun.l.google.com:19302"],
 });
 
-server.on("connection", (connection) => {
+wrs.on("connection", (connection) => {
   console.log("[SERVER] New connection");
 
   // Send reliable messages
@@ -53,6 +53,31 @@ server.on("connection", (connection) => {
 ```
 
 For detailed usage, see the [server documentation](https://webrtc-server-client.leede.ee/docs/modules/_leede_webrtc_server.html).
+
+### Running the server alongside an express app
+
+Instead of binding the `WebRTCServer` to a specific port, you can alternatively provide an instance of the `http.Server` class. This allows you to bind an express application and serve HTTP requests on the same server.
+
+```ts
+import * as http from "http";
+import * as express from "express";
+
+const app = express();
+const httpServer = new http.Server(app);
+
+app.get("/", (req, res) => res.send("Hello, world!"));
+
+const wrs = new WebRTCServer({
+  server: httpServer,
+  iceServers: ["stun:stun.l.google.com:19302"],
+});
+
+wrs.on("connection", (connection) => {
+  // ...
+});
+
+httpServer.listen(8000);
+```
 
 ## Client
 
@@ -106,27 +131,27 @@ import { WebRTCClient } from "@leede/webrtc-client";
 ```ts
 import { WebRTCClient } from "@leede/webrtc-client";
 
-const client = new WebRTCClient("ws://localhost:8000");
+const wrc = new WebRTCClient("ws://localhost:8000");
 
-client.on("open", () => {
+wrc.on("open", () => {
   console.log("[CLIENT] Connected");
 
   // Send reliable TCP messages
-  client.sendR("Hello from client over TCP");
-  client.sendR(new Float32Array([1.0, 3.14]).buffer);
+  wrc.sendR("Hello from client over TCP");
+  wrc.sendR(new Float32Array([1.0, 3.14]).buffer);
 
   // Send unreliable UDP messages
-  client.sendU("Hello from client over UDP");
-  client.sendU(Buffer.from([0, 1, 1, 2, 3, 5, 8, 13, 21, 34]));
+  wrc.sendU("Hello from client over UDP");
+  wrc.sendU(Buffer.from([0, 1, 1, 2, 3, 5, 8, 13, 21, 34]));
 });
 
 // Handle string messages from server
-client.on("message", (message) => {
+wrc.on("message", (message) => {
   console.log("[CLIENT] Received message:", message);
 });
 
 // Handle binary messages from server
-client.on("binary", (buffer) => {
+wrc.on("binary", (buffer) => {
   console.log("[CLIENT] Received buffer:", buffer);
 });
 ```

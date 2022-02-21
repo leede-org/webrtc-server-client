@@ -1,11 +1,11 @@
 import { WebRTCServer } from "@leede/webrtc-server";
 
-const server = new WebRTCServer({
+const wrs = new WebRTCServer({
   port: 8000,
   iceServers: ["stun:stun.l.google.com:19302"],
 });
 
-server.on("connection", (connection) => {
+wrs.on("connection", (connection) => {
   console.log("[SERVER] New connection");
 
   // Send reliable messages

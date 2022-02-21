@@ -9,26 +9,26 @@ global.RTCSessionDescription = wrtc.RTCSessionDescription;
 // WebRTCClient can be used in Node.JS after the above global variables are provided
 import { WebRTCClient } from "@leede/webrtc-client";
 
-const client = new WebRTCClient("ws://localhost:8000");
+const wrc = new WebRTCClient("ws://localhost:8000");
 
-client.on("open", () => {
+wrc.on("open", () => {
   console.log("[CLIENT] Connected");
 
   // Send reliable TCP messages
-  client.sendR("Hello from client over TCP");
-  client.sendR(new Float32Array([1.0, 3.14]).buffer);
+  wrc.sendR("Hello from client over TCP");
+  wrc.sendR(new Float32Array([1.0, 3.14]).buffer);
 
   // Send unreliable UDP messages
-  client.sendU("Hello from client over UDP");
-  client.sendU(Buffer.from([0, 1, 1, 2, 3, 5, 8, 13, 21, 34]));
+  wrc.sendU("Hello from client over UDP");
+  wrc.sendU(Buffer.from([0, 1, 1, 2, 3, 5, 8, 13, 21, 34]));
 });
 
 // Handle string messages from server
-client.on("message", (message) => {
+wrc.on("message", (message) => {
   console.log("[CLIENT] Received message:", message);
 });
 
 // Handle binary messages from server
-client.on("binary", (buffer) => {
+wrc.on("binary", (buffer) => {
   console.log("[CLIENT] Received buffer:", buffer);
 });

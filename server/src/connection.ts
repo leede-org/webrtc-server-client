@@ -55,14 +55,28 @@ export class WebRTCConnection extends EventEmitter {
     }
   }
 
+  /**
+   * Send a message to the connection on the reliable data channel.
+   * @param message
+   * @returns
+   */
   sendR(message: string | ArrayBuffer) {
     return this.send(this.rc, message);
   }
 
+  /**
+   * Send a message to the connection on the unreliable data channel.
+   * @param message
+   * @returns
+   */
   sendU(message: string | ArrayBuffer) {
     return this.send(this.uc, message);
   }
 
+  /**
+   * Send a message to all other connections on the reliable data channel.
+   * @param message
+   */
   broadcastR(message: string | ArrayBuffer) {
     const connections = this.server.getConnections();
 
@@ -73,6 +87,10 @@ export class WebRTCConnection extends EventEmitter {
     }
   }
 
+  /**
+   * Send a message to all other connections on the unreliable data channel.
+   * @param message
+   */
   broadcastU(message: string | ArrayBuffer) {
     const connections = this.server.getConnections();
 

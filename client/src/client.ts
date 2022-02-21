@@ -21,7 +21,37 @@ export declare interface WebRTCClient {
   emit(event: "binary", buffer: ArrayBuffer): boolean;
 }
 
+/**
+ * The {@link WebRTCServer} uses a WebSocket server for signalling so the server url must be provided with the `ws` or `wss` protocol.
+ *
+ * ```ts
+ * const wrc = new WebRTCClient("ws://localhost:8000");
+ *
+ * wrc.on("open", () => {
+ *   // connection to server established
+ * });
+ *
+ * wrc.on("message", message => {
+ *   // received string message from server
+ * });
+ *
+ * wrc.on("binary", message => {
+ *   // received binary message from server as an ArrayBuffer
+ * });
+ *
+ * wrc.on("close", () => {
+ *   // connection to server lost
+ * });
+ *
+ * wrc.on("error", () => {
+ *   // failed to establish a connection to the server
+ * });
+ * ```
+ */
 export class WebRTCClient extends EventEmitter {
+  /**
+   * The latest round-trip time of the ping to the server. This is updated with the interval set by `pingIntervalMs` in the {@link constructor}.
+   */
   public ping: number;
 
   private ws: WebSocket;
@@ -31,14 +61,24 @@ export class WebRTCClient extends EventEmitter {
   private pingSendTime: number;
   private pingTimer: NodeJS.Timer;
 
-  constructor(url: string, pingInterval = 30000) {
+  /**
+   *
+   * @param url The {@link WebRTCServer} uses a WebSocket server for signalling so the server url must
+   * be provided with the `ws` or `wss` protocol.
+   * ```ts
+   * const wrc = new WebRTCClient("ws://localhost:8000");
+   * ```
+   * @param pingIntervalMs The client periodically pings the WebSocket server to keep the connection alive
+   * and to calculate the round-trip time.
+   */
+  constructor(url: string, pingIntervalMs = 30000) {
     super();
     this.ws = new WebSocket(url);
 
     this.ws.onopen = () => {
       // console.log("[WebRTCClient] WS connection established");
 
-      this.pingTimer = setInterval(() => this.sendPing(), pingInterval);
+      this.pingTimer = setInterval(() => this.sendPing(), pingIntervalMs);
       this.sendPing();
     };
 
@@ -141,11 +181,19 @@ export class WebRTCClient extends EventEmitter {
     this.ws.send(JSON.stringify(this.pc.localDescription));
   }
 
+  /**
+   * Send a message to the server on the reliable data channel.
+   * @param message
+   */
   sendR(message: string | ArrayBuffer) {
     // @ts-ignore
     this.rc.send(message);
   }
 
+  /**
+   * Send a message to the server on the unreliable data channel.
+   * @param message
+   */
   sendU(message: string | ArrayBuffer) {
     // @ts-ignore
     this.uc.send(message);

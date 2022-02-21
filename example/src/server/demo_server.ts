@@ -14,7 +14,7 @@ if (process.env.NODE_ENV !== "development") {
 }
 
 // Simple broadcasting server
-const wrtcServer = new WebRTCServer({
+const wrs = new WebRTCServer({
   server,
   iceServers: ["stun:stun.l.google.com:19302"],
   portRangeBegin: parseInt(process.env.PORT_RANGE_BEGIN || "0"),
@@ -24,7 +24,7 @@ const wrtcServer = new WebRTCServer({
 let nextPlayerId = 1;
 const players = new Map<number, { name: string; color: string }>();
 
-wrtcServer.on("connection", (connection) => {
+wrs.on("connection", (connection) => {
   console.log(`[SERVER] New connection`);
 
   // Create a new player for this connection
@@ -74,13 +74,13 @@ wrtcServer.on("connection", (connection) => {
     broadcastBuffer.writeUInt16LE(player.cursor[1], 6);
 
     // The new cursor position is broadcasted to all connections, including the sender itself
-    wrtcServer.broadcastU(broadcastBuffer.buffer);
+    wrs.broadcastU(broadcastBuffer.buffer);
   });
 
   // Remove player on disconnect
   connection.on("close", () => {
     players.delete(id);
-    wrtcServer.broadcastR(JSON.stringify({ event: "remove-player", id }));
+    wrs.broadcastR(JSON.stringify({ event: "remove-player", id }));
   });
 });
 
